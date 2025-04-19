@@ -20,8 +20,15 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Mongoose model
 const User = mongoose.model('User', {
-  name: String,
-  email: String
+  key: String,
+  firstName: String,
+  lastName: String,
+  fullName: String,
+  email: String,
+  telephone: String,
+  role: String,
+  city: String,
+  country: String
 });
 
 // Test route voor de homepagina
