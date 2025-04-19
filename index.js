@@ -1,6 +1,14 @@
 require('dotenv').config();
+const express = require('express');
 const mongoose = require('mongoose');
 
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware om JSON te verwerken
+app.use(express.json());
+
+// MongoDB connectie
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
@@ -9,33 +17,35 @@ mongoose.connect(process.env.MONGO_URI, {
 }).catch((err) => {
   console.error('MongoDB connection error:', err);
 });
-const express = require('express');
-const app = express();
-require('dotenv').config();
-app.use(express.json());
 
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
-
+// Mongoose model
 const User = mongoose.model('User', {
   name: String,
   email: String
 });
 
+// Test route voor de homepagina
+app.get('/', (req, res) => {
+  res.send('API is live 🚀');
+});
+
+// API-routes
 app.get('/api/users', async (req, res) => {
   const users = await User.find();
   res.json(users);
 });
 
 app.post('/api/users', async (req, res) => {
-  const user = new User(req.body);
-  await user.save();
-  res.json(user);
+  try {
+    const user = new User(req.body);
+    const savedUser = await user.save();
+    res.json(savedUser);
+  } catch (err) {
+    res.status(400).json({ error: 'Error saving user', details: err });
+  }
 });
 
-const PORT = process.env.PORT || 3000;
+// Start de server
 app.listen(PORT, () => {
   console.log(`API running on port ${PORT}`);
 });
